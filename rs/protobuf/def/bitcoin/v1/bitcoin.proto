@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package bitcoin.v1;
+
+import "types/v1/errors.proto";
+
+message Transaction {
+  int32 version = 1;
+  uint32 lock_time = 2;
+  repeated TxIn input = 3;
+  repeated TxOut output = 4;
+}
+
+message TxIn {
+  OutPoint previous_output = 1;
+  bytes script_sig = 2;
+  uint32 sequence = 3;
+  repeated bytes witness = 4;
+}
+
+message TxOut {
+  uint64 value = 1;
+  bytes script_pubkey = 2;
+}
+
+message OutPoint {
+  bytes txid = 1;
+  uint32 vout = 2;
+}
+
+message BlockHeader {
+  int32 version = 1;
+  bytes prev_blockhash = 2;
+  bytes merkle_root = 3;
+  uint32 time = 4;
+  uint32 bits = 5;
+  uint32 nonce = 6;
+}
+
+message Block {
+  BlockHeader header = 1;
+  repeated Transaction txdata = 2;
+}
+
+message SendTransactionRequest {
+  Network network = 1;
+  bytes transaction = 2;
+}
+
+message SendTransactionResponse {}
+
+// Wraps the different types of requests to the Bitcoin Adapter.
+message BitcoinAdapterRequestWrapper {
+  reserved 1;
+  reserved 2;
+  oneof r {
+    GetSuccessorsRequestInitial get_successors_request = 3;
+    SendTransactionRequest send_transaction_request = 4;
+  }
+}
+
+// Wraps the different types of responses from the Bitcoin Adapter.
+message BitcoinAdapterResponseWrapper {
+  reserved 1;
+  reserved 2;
+  oneof r {
+    GetSuccessorsResponseComplete get_successors_response = 3;
+    SendTransactionResponse send_transaction_response = 4;
+    GetSuccessorsReject get_successors_reject = 5;
+    SendTransactionReject send_transaction_reject = 6;
+  }
+}
+
+// A Bitcoin Adapter request, used to store the requests in the
+// `ReplicatedState`.
+message BitcoinAdapterRequest {
+  // The wrapped Bitcoin request to the Adapter.
+  BitcoinAdapterRequestWrapper request = 1;
+  // The callback id associated with this request. Useful to match it against
+  // the incoming responses.
+  uint64 callback_id = 2;
+}
+
+// A Bitcoin Adapter response, used to store the responses in the
+// `ReplicatedState`.
+message BitcoinAdapterResponse {
+  // The wrapped Bitcoin response from the Adapter.
+  BitcoinAdapterResponseWrapper response = 1;
+  // The callback id associated with this response. Used to match a response
+  // against its corresponding request.
+  uint64 callback_id = 2;
+}
+
+enum Network {
+  NETWORK_UNSPECIFIED = 0;
+  NETWORK_TESTNET = 1;
+  NETWORK_MAINNET = 2;
+  NETWORK_REGTEST = 3;
+}
+
+// A request to retrieve new blocks from the specified Bitcoin network.
+message GetSuccessorsRequestInitial {
+  Network network = 1;
+  repeated bytes processed_block_hashes = 2;
+  bytes anchor = 3;
+}
+
+// A response containing new successor blocks from the Bitcoin network.
+message GetSuccessorsResponseComplete {
+  repeated bytes blocks = 1;
+  repeated bytes next = 2;
+}
+
+// A `GetSucceessors` reject response containing additional information about the rejection.
+message GetSuccessorsReject {
+  reserved 1;
+  reserved "reject_code_old";
+  types.v1.RejectCode reject_code = 3;
+  string message = 2;
+}
+
+// A `SendTransaction` reject response containing additional information about the rejection.
+message SendTransactionReject {
+  reserved 1;
+  reserved "reject_code_old";
+  types.v1.RejectCode reject_code = 3;
+  string message = 2;
+}

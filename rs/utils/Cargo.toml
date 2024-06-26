@@ -1,0 +1,18 @@
+[package]
+name = "ic-utils"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+hex = { workspace = true }
+scoped_threadpool = "0.1.*"
+serde = { workspace = true }
+serde_bytes = { workspace = true }
+
+[dev-dependencies]
+assert_matches = { workspace = true }
+tempfile = { workspace = true }
+serde = { workspace = true }

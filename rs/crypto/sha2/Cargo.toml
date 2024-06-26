@@ -1,0 +1,10 @@
+[package]
+name = "ic-crypto-sha2"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+ic-crypto-internal-sha2 = { path = "../internal/crypto_lib/sha2" }

@@ -1,0 +1,379 @@
+syntax = "proto3";
+package state.metadata.v1;
+
+import "bitcoin/v1/bitcoin.proto";
+import "google/protobuf/wrappers.proto";
+import "registry/crypto/v1/crypto.proto";
+import "registry/routing_table/v1/routing_table.proto";
+import "registry/subnet/v1/subnet.proto";
+import "state/canister_state_bits/v1/canister_state_bits.proto";
+import "state/ingress/v1/ingress.proto";
+import "state/queues/v1/queues.proto";
+import "types/v1/types.proto";
+
+message Time {
+  uint64 time_nanos = 1;
+}
+
+message SubnetTopologyEntry {
+  types.v1.NodeId node_id = 1;
+  reserved 2;
+}
+
+message SubnetTopology {
+  repeated SubnetTopologyEntry nodes = 1;
+  // The public key of the subnet (a DER-encoded BLS key, see
+  // https://internetcomputer.org/docs/current/references/ic-interface-spec#certification)
+  bytes public_key = 2;
+  registry.subnet.v1.SubnetType subnet_type = 3;
+  registry.subnet.v1.SubnetFeatures subnet_features = 4;
+  reserved 5;
+  reserved "ecdsa_keys_held";
+  repeated registry.crypto.v1.MasterPublicKeyId idkg_keys_held = 6;
+}
+
+message SubnetsEntry {
+  types.v1.SubnetId subnet_id = 1;
+  SubnetTopology subnet_topology = 2;
+}
+
+message IDkgKeyEntry {
+  registry.crypto.v1.MasterPublicKeyId key_id = 1;
+  repeated types.v1.SubnetId subnet_ids = 2;
+}
+
+message NetworkTopology {
+  repeated SubnetsEntry subnets = 1;
+  registry.routing_table.v1.RoutingTable routing_table = 2;
+  types.v1.SubnetId nns_subnet_id = 3;
+  registry.routing_table.v1.CanisterMigrations canister_migrations = 4;
+  reserved 5;
+  reserved "ecdsa_signing_subnets";
+  repeated types.v1.CanisterId bitcoin_testnet_canister_ids = 6;
+  repeated types.v1.CanisterId bitcoin_mainnet_canister_ids = 7;
+  repeated IDkgKeyEntry idkg_signing_subnets = 8;
+}
+
+message SetupInitialDkgContext {
+  state.queues.v1.Request request = 1;
+  repeated types.v1.NodeId nodes_in_subnet = 2;
+  reserved 3;
+  reserved "subnet_id";
+  bytes target_id = 4;
+  uint64 registry_version = 5;
+  Time time = 6;
+}
+
+message SetupInitialDkgContextTree {
+  uint64 callback_id = 1;
+  SetupInitialDkgContext context = 2;
+}
+
+message SignWithEcdsaContext {
+  state.queues.v1.Request request = 1;
+  bytes pseudo_random_id = 2;
+  bytes message_hash = 3;
+  reserved 4;
+  reserved "derivation_path";
+  uint64 batch_time = 5;
+  repeated bytes derivation_path_vec = 6;
+  registry.crypto.v1.EcdsaKeyId key_id = 7;
+  optional uint64 height = 8;
+  optional uint64 pre_signature_id = 9;
+  optional bytes nonce = 10;
+}
+
+message SignWithEcdsaContextTree {
+  uint64 callback_id = 1;
+  SignWithEcdsaContext context = 2;
+}
+
+message EcdsaArguments {
+  registry.crypto.v1.EcdsaKeyId key_id = 1;
+  bytes message_hash = 2;
+}
+
+message SchnorrArguments {
+  registry.crypto.v1.SchnorrKeyId key_id = 1;
+  bytes message = 2;
+}
+
+message ThresholdArguments {
+  oneof threshold_scheme {
+    EcdsaArguments ecdsa = 1;
+    SchnorrArguments schnorr = 2;
+  }
+}
+
+message SignWithThresholdContext {
+  state.queues.v1.Request request = 1;
+  ThresholdArguments args = 2;
+  repeated bytes derivation_path_vec = 3;
+  bytes pseudo_random_id = 4;
+  uint64 batch_time = 5;
+  optional uint64 pre_signature_id = 6;
+  optional uint64 height = 7;
+  optional bytes nonce = 8;
+}
+
+message SignWithThresholdContextTree {
+  uint64 callback_id = 1;
+  SignWithThresholdContext context = 2;
+}
+
+enum HttpMethod {
+  HTTP_METHOD_UNSPECIFIED = 0;
+  HTTP_METHOD_GET = 1;
+  HTTP_METHOD_POST = 2;
+  HTTP_METHOD_HEAD = 3;
+}
+
+message HttpHeader {
+  string name = 1;
+  string value = 2;
+}
+
+message CanisterHttpRequestContext {
+  state.queues.v1.Request request = 1;
+  string url = 2;
+  google.protobuf.BytesValue body = 3;
+  google.protobuf.StringValue transform_method_name = 4;
+  HttpMethod http_method = 8;
+  uint64 time = 6;
+  repeated HttpHeader headers = 7;
+  optional uint64 max_response_bytes = 9;
+  google.protobuf.BytesValue transform_context = 10;
+  reserved 5;
+}
+
+message CanisterHttpRequestContextTree {
+  uint64 callback_id = 1;
+  CanisterHttpRequestContext context = 2;
+}
+
+// TODO(EXC-1621): remove after migrating to `idkg_dealings_contexts`.
+message EcdsaDealingsContext {
+  state.queues.v1.Request request = 1;
+  reserved 2;
+  repeated types.v1.NodeId nodes = 3;
+  uint64 registry_version = 4;
+  registry.crypto.v1.EcdsaKeyId key_id = 5;
+  Time time = 6;
+}
+
+// TODO(EXC-1621): remove after migrating to `idkg_dealings_contexts`.
+message EcdsaDealingsContextTree {
+  uint64 callback_id = 1;
+  EcdsaDealingsContext context = 2;
+}
+
+message IDkgDealingsContext {
+  state.queues.v1.Request request = 1;
+  registry.crypto.v1.MasterPublicKeyId key_id = 2;
+  repeated types.v1.NodeId nodes = 3;
+  uint64 registry_version = 4;
+  Time time = 5;
+}
+
+message IDkgDealingsContextTree {
+  uint64 callback_id = 1;
+  IDkgDealingsContext context = 2;
+}
+
+message BitcoinGetSuccessorsContext {
+  state.queues.v1.Request request = 1;
+  bitcoin.v1.GetSuccessorsRequestInitial payload = 2;
+  Time time = 3;
+}
+
+message BitcoinGetSuccessorsContextTree {
+  uint64 callback_id = 1;
+  BitcoinGetSuccessorsContext context = 2;
+}
+
+message BitcoinSendTransactionInternalContext {
+  state.queues.v1.Request request = 1;
+  bitcoin.v1.SendTransactionRequest payload = 2;
+  Time time = 3;
+}
+
+message BitcoinSendTransactionInternalContextTree {
+  uint64 callback_id = 1;
+  BitcoinSendTransactionInternalContext context = 2;
+}
+
+// TODO(EXC-1454): Deprecated.
+message InstallCodeRequest {
+  state.queues.v1.Request request = 1;
+  Time time = 2;
+  types.v1.CanisterId effective_canister_id = 3;
+}
+
+message InstallCodeCall {
+  oneof canister_call {
+    state.queues.v1.Request request = 1;
+    ingress.v1.Ingress ingress = 2;
+  }
+  Time time = 3;
+  types.v1.CanisterId effective_canister_id = 4;
+}
+
+// TODO(EXC-1454): Deprecated.
+message InstallCodeRequestTree {
+  uint64 request_id = 1;
+  InstallCodeRequest request = 2;
+}
+
+message InstallCodeCallTree {
+  uint64 call_id = 1;
+  InstallCodeCall call = 2;
+}
+
+message StopCanisterCall {
+  oneof canister_call {
+    state.queues.v1.Request request = 1;
+    ingress.v1.Ingress ingress = 2;
+  }
+  Time time = 3;
+  types.v1.CanisterId effective_canister_id = 4;
+}
+
+message StopCanisterCallTree {
+  uint64 call_id = 1;
+  StopCanisterCall call = 2;
+}
+
+message RawRandContext {
+  state.queues.v1.Request request = 1;
+  Time time = 2;
+  uint64 execution_round_id = 3;
+}
+
+message SubnetCallContextManager {
+  uint64 next_callback_id = 1;
+  reserved 2;
+  reserved "contexts";
+  repeated SetupInitialDkgContextTree setup_initial_dkg_contexts = 3;
+  repeated SignWithEcdsaContextTree sign_with_ecdsa_contexts = 4;
+  reserved 5;
+  reserved "sign_with_mock_ecdsa_contexts";
+  repeated CanisterHttpRequestContextTree canister_http_request_contexts = 6;
+  // TODO(EXC-1621): remove after migrating to `idkg_dealings_contexts`.
+  repeated EcdsaDealingsContextTree ecdsa_dealings_contexts = 7;
+  repeated BitcoinGetSuccessorsContextTree bitcoin_get_successors_contexts = 8;
+  repeated BitcoinSendTransactionInternalContextTree bitcoin_send_transaction_internal_contexts = 9;
+  reserved 10;
+  // TODO(EXC-1454): Deprecated.
+  repeated InstallCodeRequestTree install_code_requests = 11;
+  uint64 next_install_code_call_id = 12;
+  reserved "next_install_code_request_id";
+  repeated InstallCodeCallTree install_code_calls = 13;
+  uint64 next_stop_canister_call_id = 14;
+  repeated StopCanisterCallTree stop_canister_calls = 15;
+  repeated RawRandContext raw_rand_contexts = 16;
+  repeated IDkgDealingsContextTree idkg_dealings_contexts = 17;
+  repeated SignWithThresholdContextTree sign_with_threshold_contexts = 18;
+}
+
+message SubnetMetrics {
+  types.v1.NominalCycles consumed_cycles_by_deleted_canisters = 1;
+  types.v1.NominalCycles consumed_cycles_http_outcalls = 2;
+  types.v1.NominalCycles consumed_cycles_ecdsa_outcalls = 3;
+  optional uint64 ecdsa_signature_agreements = 4;
+  repeated canister_state_bits.v1.ConsumedCyclesByUseCase consumed_cycles_by_use_case = 5;
+  optional uint64 num_canisters = 6;
+  reserved 7;
+  reserved "total_canister_state";
+  reserved 8;
+  reserved "num_update_transactions";
+  optional uint64 canister_state_bytes = 9;
+  optional uint64 update_transactions_total = 10;
+}
+
+message BitcoinGetSuccessorsFollowUpResponses {
+  types.v1.CanisterId sender = 1;
+  repeated bytes payloads = 2;
+}
+
+message NodePublicKeyEntry {
+  types.v1.NodeId node_id = 1;
+  bytes public_key = 2;
+}
+
+message ApiBoundaryNodeEntry {
+  types.v1.NodeId node_id = 1;
+  string domain = 2;
+  optional string ipv4_address = 3;
+  string ipv6_address = 4;
+  optional bytes pubkey = 5;
+}
+
+message NodeBlockmakerStats {
+  types.v1.NodeId node_id = 1;
+  uint64 blocks_proposed_total = 2;
+  uint64 blocks_not_proposed_total = 3;
+}
+
+message BlockmakerStatsMap {
+  repeated NodeBlockmakerStats node_stats = 1;
+  uint64 blocks_proposed_total = 2;
+  uint64 blocks_not_proposed_total = 3;
+}
+
+message BlockmakerMetricsTimeSeries {
+  map<uint64, BlockmakerStatsMap> time_stamp_map = 1;
+}
+
+message SystemMetadata {
+  reserved 1, 4, 12, 14;
+  reserved "generated_id_counter", "ingress_history", "stable_memory_delta_estimate", "time_of_last_allocation_charge_nanos";
+
+  google.protobuf.BytesValue prev_state_hash = 2;
+  uint64 batch_time_nanos = 3;
+  repeated queues.v1.StreamEntry streams = 5;
+  NetworkTopology network_topology = 6;
+  types.v1.SubnetId own_subnet_id = 7;
+  SubnetCallContextManager subnet_call_context_manager = 8;
+
+  // Canister ID ranges allocated (exclusively) to this subnet, to generate
+  // canister IDs from.
+  registry.routing_table.v1.CanisterIdRanges canister_allocation_ranges = 16;
+  // The last generated canister ID; or `None` if no canister ID has yet been
+  // generated by this subnet.
+  //
+  // If present, must be within the first `CanisterIdRange` in
+  // `canister_allocation_ranges` (and the latter may not be empty).
+  types.v1.CanisterId last_generated_canister_id = 17;
+
+  // Version of the StateSync protocol that should be used to compute
+  // checkpoint manifests and transmit state.
+  uint32 state_sync_version = 9;
+
+  // Version of the certification protocol that should be used to
+  // certify this state.
+  uint32 certification_version = 10;
+
+  uint64 heap_delta_estimate = 11;
+
+  registry.subnet.v1.SubnetFeatures own_subnet_features = 13;
+
+  SubnetMetrics subnet_metrics = 15;
+
+  repeated BitcoinGetSuccessorsFollowUpResponses bitcoin_get_successors_follow_up_responses = 18;
+
+  repeated NodePublicKeyEntry node_public_keys = 19;
+
+  BlockmakerMetricsTimeSeries blockmaker_metrics_time_series = 20;
+
+  repeated ApiBoundaryNodeEntry api_boundary_nodes = 21;
+}
+
+message StableMemory {
+  bytes memory = 1;
+}
+
+message SplitFrom {
+  // If present, the subnet is mid-way through a split. Identifies the original
+  // subnet that this was split from.
+  types.v1.SubnetId subnet_id = 1;
+}

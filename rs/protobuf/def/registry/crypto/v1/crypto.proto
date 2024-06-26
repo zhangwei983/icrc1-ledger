@@ -1,0 +1,88 @@
+// Protobuf definitions describing all value types stored in the registry.
+syntax = "proto3";
+package registry.crypto.v1;
+
+import "google/protobuf/wrappers.proto";
+import "types/v1/types.proto";
+
+// An algorithm ID. This is used to specify the signature algorithm associated with a public key.
+enum AlgorithmId {
+  ALGORITHM_ID_UNSPECIFIED = 0;
+  ALGORITHM_ID_MULTI_BLS12_381 = 1;
+  ALGORITHM_ID_THRES_BLS12_381 = 2;
+  ALGORITHM_ID_SCHNORR_SECP256K1 = 3;
+  ALGORITHM_ID_STATIC_DH_SECP256K1 = 4;
+  ALGORITHM_ID_HASH_SHA256 = 5;
+  ALGORITHM_ID_TLS = 6;
+  ALGORITHM_ID_ED25519 = 7;
+  ALGORITHM_ID_SECP256K1 = 8;
+  ALGORITHM_ID_GROTH20_BLS12_381 = 9;
+  ALGORITHM_ID_NIDKG_GROTH20_BLS12_381 = 10;
+  ALGORITHM_ID_ECDSA_P256 = 11;
+  ALGORITHM_ID_ECDSA_SECP_256K1 = 12;
+  ALGORITHM_ID_IC_CANISTER_SIGNATURE = 13;
+  ALGORITHM_ID_RSA_SHA256 = 14;
+  ALGORITHM_ID_THRESHOLD_ECDSA_SECP_256K1 = 15;
+  ALGORITHM_ID_MEGA_SECP_256K1 = 16;
+  ALGORITHM_ID_THRESHOLD_ECDSA_SECP_256R1 = 17;
+  ALGORITHM_ID_THRESHOLD_SCHNORR_BIP340 = 18;
+  ALGORITHM_ID_THRESHOLD_ED25519 = 19;
+}
+
+// A list of subnets that can sign with this ECDSA key.
+// This allows replicas to route their signing requests to the right subnets.
+message ECDSASigningSubnetList {
+  reserved 1;
+  repeated types.v1.SubnetId subnets = 2;
+}
+
+// A list of subnets that can sign with a given chain key.
+// This allows replicas to route their signing requests to the right subnets.
+message ChainKeySigningSubnetList {
+  repeated types.v1.SubnetId subnets = 1;
+}
+
+// A public key. Described by its `AlgorithmId`, the key's value and proof data holding, e.g., a proof of possession (PoP).
+message PublicKey {
+  uint32 version = 1;
+  AlgorithmId algorithm = 2;
+  bytes key_value = 3;
+  google.protobuf.BytesValue proof_data = 4;
+  // Number of non-leap-milliseconds since January 1, 1970 UTC.
+  google.protobuf.UInt64Value timestamp = 5;
+}
+
+// DER-encoded X509 public key certificate
+message X509PublicKeyCert {
+  bytes certificate_der = 1;
+}
+
+// Types of curves that can be used for ECDSA signatures.
+enum EcdsaCurve {
+  ECDSA_CURVE_UNSPECIFIED = 0;
+  ECDSA_CURVE_SECP256K1 = 1;
+}
+
+message EcdsaKeyId {
+  EcdsaCurve curve = 1;
+  string name = 2;
+}
+
+// Types of curves that can be used for Schnorr signatures.
+enum SchnorrAlgorithm {
+  SCHNORR_ALGORITHM_UNSPECIFIED = 0;
+  SCHNORR_ALGORITHM_BIP340SECP256K1 = 1;
+  SCHNORR_ALGORITHM_ED25519 = 2;
+}
+
+message SchnorrKeyId {
+  SchnorrAlgorithm algorithm = 1;
+  string name = 2;
+}
+
+message MasterPublicKeyId {
+  oneof key_id {
+    EcdsaKeyId ecdsa = 1;
+    SchnorrKeyId schnorr = 2;
+  }
+}

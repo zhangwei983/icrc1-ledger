@@ -1,0 +1,21 @@
+[package]
+name = "ic-crypto-internal-types"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+arrayvec = { workspace = true }
+hex = { workspace = true }
+ic-protobuf = { path = "../../../../protobuf" }
+phantom_newtype = { path = "../../../../phantom_newtype" }
+serde = { workspace = true }
+serde_cbor = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+thiserror = { workspace = true }
+zeroize = { version = "1.4.3", features = ["zeroize_derive"] }
+
+[dev-dependencies]
