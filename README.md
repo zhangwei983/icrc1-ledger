@@ -7,6 +7,9 @@ This is an icrc1 ledger implementation decoupled from https://github.com/dfinity
 ../rs/bitcoin/types/internal
 
 ../rs/constants
+../rs/utils
+../rs/protobuf
+../rs/phantom_newtype
 
 ../rs/crypto/internal/crypto_lib/sha2
 ../rs/crypto/internal/crypto_lib/types
@@ -26,10 +29,6 @@ This is an icrc1 ledger implementation decoupled from https://github.com/dfinity
 ../rs/types/error_types
 ../rs/types/base_types
 ../rs/types/management_canister_types
-
-../rs/utils
-../rs/protobuf
-../rs/phantom_newtype
 
 ../packages/ic-ledger-hash-of
 ../packages/icrc-ledger-types
