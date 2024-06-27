@@ -39,6 +39,5 @@ This is an icrc1 ledger implementation decoupled from https://github.com/dfinity
 ## Build 
 
 ```bash
-cd rs/rosetta-api/icrc1/ledger
 cargo build --target wasm32-unknown-unknown --profile canister-release --package ic-icrc1-ledger
 ```
