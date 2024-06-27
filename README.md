@@ -1,5 +1,5 @@
 # icrc1-ledger
-This is an icrc1 ledger implementation decoupled from https://github.com/dfinity/ic.
+This is an icrc1 ledger implementation decoupled from https://github.com/dfinity/ic, based on changeset [9c006a50d364edf1403ef50b24c3be39dba8a5f6](https://github.com/dfinity/ic/releases/tag/release-2024-06-19_23-01-cycle-hotfix).
 
 ## Dependencies
 
@@ -21,6 +21,7 @@ This is an icrc1 ledger implementation decoupled from https://github.com/dfinity
 
 ../rs/rosetta-api/icrc1/ledger
 ../rs/rosetta-api/ledger_core
+../rs/rosetta-api/icrc1/tokens_u256
 ../rs/rosetta-api/icrc1/tokens_u64
 ../rs/rosetta-api/ledger_canister_core
 
@@ -39,5 +40,5 @@ This is an icrc1 ledger implementation decoupled from https://github.com/dfinity
 
 ```bash
 cd rs/rosetta-api/icrc1/ledger
-cargo build --release --target wasm32-unknown-unknown --package ic-icrc1-ledger
+cargo build --target wasm32-unknown-unknown --profile canister-release --package ic-icrc1-ledger
 ```
