@@ -1,0 +1,31 @@
+[package]
+name = "ic-icrc1"
+description = "ICRC-1 compliant ledger library."
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+documentation.workspace = true
+
+[dependencies]
+candid = { workspace = true }
+ciborium = { workspace = true }
+hex = { workspace = true }
+ic-base-types = { path = "../../types/base_types" }
+ic-crypto-sha2 = { path = "../../crypto/sha2" }
+ic-ledger-canister-core = { path = "../ledger_canister_core" }
+ic-ledger-core = { path = "../ledger_core" }
+ic-ledger-hash-of = { path = "../../../packages/ic-ledger-hash-of" }
+icrc-ledger-types = { path = "../../../packages/icrc-ledger-types" }
+num-bigint = "0.4"
+num-traits = { workspace = true }
+serde = { workspace = true }
+serde_bytes = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+ic-icrc1-tokens-u256 = { path = "tokens_u256" }
+ic-icrc1-tokens-u64 = { path = "tokens_u64" }
+leb128 = "0.2.4"
+proptest = "1.0"
+rand = { workspace = true }

@@ -17,18 +17,8 @@ thiserror = { workspace = true }
 [dev-dependencies]
 assert_matches = { workspace = true }
 criterion = { workspace = true }
-ic-crypto-test-utils-reproducible-rng = { path = "../test_utils/reproducible_rng" }
-ic-crypto-tree-hash-test-utils = { path = "test_utils" }
 maplit = "1.0.2"
 proptest = "1.0"
 prost = { workspace = true }
 rand = { workspace = true }
 serde_cbor = { workspace = true }
-
-[[bench]]
-name = "tree_hash"
-harness = false
-
-[[bench]]
-name = "flat_map"
-harness = false

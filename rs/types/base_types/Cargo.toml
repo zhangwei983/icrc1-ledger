@@ -20,8 +20,6 @@ serde = { workspace = true }
 
 [dev-dependencies]
 assert_matches = { workspace = true }
-ic-base-types-protobuf-generator = { path = "./protobuf_generator" }
-ic-test-utilities-compare-dirs = { path = "../../test_utilities/compare_dirs" }
 proptest = "1.0"
 proptest-derive = "0.3.0"
 serde_cbor = { workspace = true }

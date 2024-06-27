@@ -19,5 +19,4 @@ slog = { workspace = true }
 [dev-dependencies]
 hex = { workspace = true }
 ic-protobuf-generator = { path = "./generator" }
-ic-test-utilities-compare-dirs = { path = "../test_utilities/compare_dirs" }
 tempfile = { workspace = true }
