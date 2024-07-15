@@ -16,7 +16,7 @@ There're several things I followed during the decoupling:
 
 ## Dependencies
 
-The below are the necessary dependencies for the `ic-icrc1-ledger` package.
+The below are the necessary dependencies for the `ic-icrc1-ledger` package, along with `ic-icrc1-index` and `ic-icrc1-index-ng` packages.
 
 ```
 packages/ic-ledger-hash-of
@@ -36,9 +36,12 @@ rs/phantom_newtype
 rs/protobuf
 
 rs/rust_canisters/canister_log
+rs/rust_canisters/canister_profiler
 rs/rust_canisters/http_types
 
 rs/rosetta-api/icrc1
+rs/rosetta-api/icrc1/index,
+rs/rosetta-api/icrc1/index-ng
 rs/rosetta-api/icrc1/ledger
 rs/rosetta-api/icrc1/tokens_u256
 rs/rosetta-api/icrc1/tokens_u64
@@ -56,7 +59,7 @@ I believe there're some dependencies can be removed from the list, for example `
 
 So I simply keep them, and rely on the [ic-wasm](https://github.com/dfinity/ic-wasm) to remove unused code. Not sure if it's the best choice, but let it be now.
 
-## Build 
+## Build ICRC1 Ledger Canister
 
 You can build the ICRC1 ledger as below:
 
@@ -83,3 +86,22 @@ Below is a table about build size, comparing to building from [IC](https://githu
 As you can see the Wasm code built from this repo is bigger than the one built from the IC repo. Not quite sure the root cause, but apparently some unnecesary dependencies are packed into the build. 
 
 But fortunately, the Wasm code size is pretty much the same after shrinking by `ic-wasm`.
+
+## Build ICRC1 Index Canister
+
+You can build the ICRC1 index canister as below:
+
+```bash
+cargo build --target wasm32-unknown-unknown --profile canister-release --package ic-icrc1-index
+```
+
+or
+```bash
+cargo build --target wasm32-unknown-unknown --profile canister-release --package ic-icrc1-index-ng
+```
+
+[ic-icrc1-index-ng](./rs/rosetta-api/icrc1/index-ng/index-ng.did) contains more interfaces than [ic-icrc1-index](./rs/rosetta-api/icrc1/index/index.did).
+
+As building ICRC1 ledger, you can use [ic-wasm](https://github.com/dfinity/ic-wasm) to optimize the Wasm code as well.
+
+For how to use the Index canister, please refer to the [Index canisters](https://internetcomputer.org/docs/current/developer-docs/defi/tokens/indexes) development document.
